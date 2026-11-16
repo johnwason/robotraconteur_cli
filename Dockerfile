@@ -7,4 +7,5 @@ FROM localhost/rr-ts-mcp-dev
 
 WORKDIR /work/robotraconteur_cli
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+# The sources are mounted later, so prepare, which builds them, is skipped here
+RUN npm ci --no-audit --no-fund --ignore-scripts

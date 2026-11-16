@@ -1,0 +1,7 @@
+service example.undefined
+
+stdver 0.10
+
+object Robot
+    property Missing position
+end

@@ -56,6 +56,12 @@ export function serviceLabel(s: ServiceInfo2): string
     return `${s.nodeName || s.nodeID.toString()}/${s.name}`;
 }
 
+/** Every node has this service, which lists the others, so listings leave it out */
+export function isServiceIndex(s: ServiceInfo2): boolean
+{
+    return s.rootObjectType === "RobotRaconteurServiceIndex.ServiceIndex";
+}
+
 /** Whether a target is a URL rather than a name found by discovery */
 export function isUrl(target: string): boolean
 {
@@ -213,7 +219,7 @@ export class Session
         const found = matching(list);
         if (found.length === 1) return found[0]!;
         if (found.length > 1) throw new UsageError(`More than one node has a service named "${service}": ${found.map(serviceLabel).join(", ")}. Give the node, such as ${serviceLabel(found[0]!)}`);
-        const known = list.map(serviceLabel);
+        const known = list.filter((s) => !isServiceIndex(s)).map(serviceLabel);
         throw new Error(`Service "${target}" was not found within ${this.options.timeout / 1000} s. ${known.length > 0 ? `Found: ${known.join(", ")}` : "No services were found. Check that the service is running, or give its URL."}`);
     }
 

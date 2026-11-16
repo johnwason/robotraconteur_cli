@@ -1,0 +1,5 @@
+service example.syntax
+
+object Robot
+    property double
+end

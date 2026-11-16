@@ -1,0 +1,12 @@
+service example.robot
+
+stdver 0.10
+
+import example.base
+
+using example.base.Vector2
+
+object Robot
+    property Vector2 position
+    function void move(Vector2 target)
+end

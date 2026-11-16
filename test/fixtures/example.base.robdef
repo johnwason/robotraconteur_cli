@@ -1,0 +1,8 @@
+service example.base
+
+stdver 0.10
+
+struct Vector2
+    field double x
+    field double y
+end

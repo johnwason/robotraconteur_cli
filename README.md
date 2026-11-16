@@ -2,10 +2,19 @@
 
 `rrac` finds and uses [Robot Raconteur](https://github.com/robotraconteur/robotraconteur) services from the command line, much as the `ros2` command does for ROS 2. It is written in TypeScript on the pure TypeScript [robotraconteur](https://www.npmjs.com/package/robotraconteur) and [robotraconteur-node](https://www.npmjs.com/package/robotraconteur-node) packages, and needs only Node.js 22 or later.
 
+It is not on npm yet. To install it from GitHub, with Node.js 22 or later and git:
+
 ```
-npm install -g robotraconteur-cli
+git clone https://github.com/johnwason/robotraconteur_cli.git
+cd robotraconteur_cli
+npm install
+npm install -g .
 rrac discover
 ```
+
+`npm install -g .` links the global `rrac` command to the clone, so keep the folder. To update, run `git pull` and `npm install` in it. Run `npm uninstall -g robotraconteur-cli` to remove the command.
+
+Installing directly with `npm install -g github:johnwason/robotraconteur_cli` does not work, because npm does not install the build tools needed to build a package from git for a global install.
 
 > **Note: AI-generated experiment.** `rrac` was written by an AI coding assistant (Claude Opus 5.5 in Claude Code), directed by the author of Robot Raconteur. It was produced in one session from a short request to make a Robot Raconteur command line tool like the `ros2` command, using the Robot Raconteur MCP server's tools as a guide to which commands to offer.
 >

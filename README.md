@@ -7,6 +7,15 @@ npm install -g robotraconteur-cli
 rrac discover
 ```
 
+> **Note: AI-generated experiment.** `rrac` was written by an AI coding assistant (Claude Opus 5.5 in Claude Code), directed by the author of Robot Raconteur. It was produced in one session from a short request to make a Robot Raconteur command line tool like the `ros2` command, using the Robot Raconteur MCP server's tools as a guide to which commands to offer.
+>
+> - **What it reuses:** the conversion between Robot Raconteur values and JSON, and the code that describes objects, are adapted from the MCP server, which had already been tested heavily. All protocol work is done by the `robotraconteur` and `robotraconteur-node` packages.
+> - **What was tested:** the commands were tested in a container on an isolated network, against a Python test service that has each kind of member (`test/services/cli_test_service.py`), and checked by hand against Reynard the Robot.
+> - **What wasn't:** TLS (`rrs+tcp`), WebSockets, logins with a password, discovery across a real network, Ctrl-C partway through a generator, and real robots and devices.
+> - **A fragile part:** `rrac robdef show` gets the original text of a service definition through internal methods of the `robotraconteur` package, which may change without notice.
+>
+> It has not been fully verified. Check what it does before relying on it, especially with commands that move hardware.
+
 ## Commands
 
 | Command | What it does | ROS 2 equivalent |

@@ -4,6 +4,12 @@
     "description": "rrac, a command line tool for finding and using Robot Raconteur services",
     "license": "Apache-2.0",
     "author": "Wason Technology, LLC",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/johnwason/robotraconteur_cli.git"
+    },
+    "homepage": "https://github.com/johnwason/robotraconteur_cli#readme",
+    "bugs": "https://github.com/johnwason/robotraconteur_cli/issues",
     "keywords": [
         "robotraconteur",
         "robot raconteur",

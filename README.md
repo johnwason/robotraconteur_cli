@@ -100,7 +100,7 @@ rrac wire echo robot robot_state --json | jq '.value.joint_position'
 
 Wire values printed with `--json` include the timestamp the service sent with them, in seconds since the epoch. `--max-array N` shortens long arrays in text output.
 
-Streaming commands (`wire echo`, `wire hz`, `pipe echo`, `event echo`) run until Ctrl-C, or until `--count` values have been printed.
+Streaming commands (`wire echo`, `wire hz`, `pipe echo`, `event echo`) run until Ctrl-C, or until `--count` values have been printed. `wire echo --rate HZ` prints at most HZ values per second. When values arrive faster, it prints the newest one at the end of each period and skips the others.
 
 Exit codes are 0 for success, 1 for a failed operation, 2 for a command line error, and 130 for a command interrupted by Ctrl-C before it finished. A streaming command stopped with Ctrl-C exits with 0.
 

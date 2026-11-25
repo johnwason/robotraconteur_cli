@@ -224,9 +224,12 @@ const wireEcho: Command = {
     name: ["wire", "echo"],
     usage: "<target> <wire>",
     summary: "Connect to a wire and print each value it sends",
-    details: "Runs until Ctrl-C, or until --count values have been printed. With --json, each line has the timestamp and value.",
+    details: `Runs until Ctrl-C, or until --count values have been printed. With --json, each line has the
+timestamp and value. --rate limits how often values are printed: when they arrive faster, the
+newest one is printed at the end of each period and the others are skipped.`,
     options: {
         count: COUNT,
+        rate: { type: "string", short: "r", value: "HZ", description: "Print at most HZ values per second" },
         timestamp: { type: "boolean", description: "Print the timestamp of each value in text output" }
     },
     connects: true,
@@ -239,13 +242,38 @@ const wireEcho: Command = {
         const m = memberOf(stub, ctx.args[1]!, ["wire"]);
         if (m.modifiers?.includes("writeonly")) throw new Error(`${m.name} is writeonly, so sends no values`);
         const stream = new Stream(ctx, integerOption(ctx.values, "count", 0, 1));
+        const rate = numberOption(ctx.values, "rate", 0, 0);
+        if (ctx.values.rate !== undefined && rate <= 0) throw new UsageError("--rate must be more than 0");
+        const period = rate > 0 ? 1000 / rate : 0;
         const show_time = ctx.values.timestamp === true;
+        const print = (j: Record<string, unknown>) =>
+        {
+            last_print = performance.now();
+            stream.print(j, () => show_time ? `# ${String(j.timestamp)}\n${ctx.out.format(j.value)}` : ctx.out.format(j.value));
+        };
+        let last_print = -Infinity;
+        // The newest value waiting for the period to end, which replaces any older one
+        let pending: Record<string, unknown> | undefined;
+        let timer: ReturnType<typeof setTimeout> | undefined;
         const handle = await stub.connectWire(m.name);
         stub.setWireCloseCallback(handle, () => stream.stop.fail(new Error(`The service closed wire ${m.name}`)));
         stub.addWireValueChangedListener(handle, (_h, value, timestamp) =>
         {
             const j = wireJson(stub, m, value, timestamp);
-            stream.print(j, () => show_time ? `# ${j.timestamp}\n${ctx.out.format(j.value)}` : ctx.out.format(j.value));
+            const wait = last_print + period - performance.now();
+            if (wait <= 0 && timer === undefined)
+            {
+                print(j);
+                return;
+            }
+            pending = j;
+            timer ??= setTimeout(() =>
+            {
+                timer = undefined;
+                const p = pending!;
+                pending = undefined;
+                print(p);
+            }, wait);
         });
         try
         {
@@ -253,6 +281,7 @@ const wireEcho: Command = {
         }
         finally
         {
+            clearTimeout(timer);
             stub.setWireCloseCallback(handle, null);
             await stub.closeWire(handle).catch(() => undefined);
         }

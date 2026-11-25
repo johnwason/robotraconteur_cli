@@ -242,6 +242,20 @@ describe("wires and pipes", () =>
         assert.match(text, /^\[\d+, 0\.5\]\n---\n\[\d+, 0\.5\]\n---\n$/);
     });
 
+    test("echo at a limited rate", async () =>
+    {
+        // The service sends 50 values a second, so at 5 a second about 10 are skipped between each
+        const values = await jsonLines(["wire", "echo", URL, "position", "-n", "3", "--rate", "5"]) as { timestamp: string; value: number[] }[];
+        assert.equal(values.length, 3);
+        for (let i = 1; i < values.length; i++)
+        {
+            const gap = Number(values[i]!.timestamp) - Number(values[i - 1]!.timestamp);
+            assert.ok(gap >= 0.15 && gap < 0.4, `gap ${gap}`);
+            assert.ok(values[i]!.value[0]! - values[i - 1]!.value[0]! >= 5, JSON.stringify(values));
+        }
+        await fails(["wire", "echo", URL, "position", "--rate", "0"], 2, /--rate must be more than 0/);
+    });
+
     test("echo stops cleanly on Ctrl-C", async () =>
     {
         const r = await rrac(["wire", "echo", URL, "position", "--json"], { interruptAfter: 1500 });
